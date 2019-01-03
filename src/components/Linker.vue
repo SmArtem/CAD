@@ -1,70 +1,33 @@
 <template>
-  <div class="hello" style="width: 100%;">
-    <h1>{{ msg }}</h1>
-    <input v-b-tooltip.hover title="Элементов на плате" v-model="count" type="numder">
-    <b-alert :show="showDismissibleAlert" variant="danger">Введите число больше единицы</b-alert>
-    </br>
-  </div>
+  <svg ref="svg" width="1600" height="900" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"></svg>
 </template>
 
 <script>
-import Matrix from '@/utils/Linker'
-import Gr from '@/utils/gr'
-import { mapState } from 'vuex'
+import gr from '@/utils/gr'
+import * as d3 from 'd3'
 
 export default {
-  name: 'Linker',
-  data () {
-    return {
-      msg: 'Результат компоновки',
-      count: 4,
-      showDismissibleAlert: false
+  name: 'linker',
+  computed: {
+    graph () {
+      return this.$store.getters.linker
     }
   },
-  computed: mapState({
-    testGraph (state) {
-      if (this.count > 1) {
-        this.showDismissibleAlert = false
-        return Matrix(state, this.count)
-      } else { this.showDismissibleAlert = true }
-    }
-  }),
   watch: {
-    // эта функция запускается при любом изменении вопроса
-    testGraph: function () {
-      this.$d3.select('svg').remove()
-      this.getGraph()
+    graph: function () {
+      this.updateGraph()
     }
   },
   mounted: function () {
-    this.$d3.select('svg').remove()
-    this.getGraph()
+    this.updateGraph()
   },
   methods: {
-    getGraph: function () {
-      let d3 = this.$d3
-      let width = 960
-      let height = 600
-      let svg = d3.select('.hello').append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        // .attr('viewBox', '0 0 1920 1200')
-        // .attr('preserveAspectRatio', 'xMidYMid meet')
-      Gr(d3, svg, this.testGraph)
+    updateGraph: function () {
+      const svg = d3.select(this.$refs.svg)
+      this.$nextTick().then(() => {
+        gr(d3, svg, this.graph, this.$store.state.colorScheme)
+      })
     }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.links line {
-  stroke: #999;
-  stroke-opacity: 0.6;
-}
-
-.nodes circle {
-  stroke: #fff;
-  stroke-width: 1.5px;
-}
-</style>

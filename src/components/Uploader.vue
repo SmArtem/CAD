@@ -1,22 +1,24 @@
 <template>
-  <div>
-    <b-form-file id="file_input1" @change="onFileChange"></b-form-file>
-  </div>
+  <label :for="generateId" class="uploader">
+    <input class="uploader__input" :id="generateId" type="file" @change="onFileChange" accept=".net"/>
+    {{label}}
+  </label>
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
-
 export default {
   name: 'uploader',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js CAD'
+      label: 'Загрузите файл'
     }
   },
   computed: {
     count () {
       return this.$store.state.listOfNets
+    },
+    generateId () {
+      return Math.floor(Math.random() * 10000)
     }
   },
   methods: {
@@ -26,6 +28,7 @@ export default {
         return
       }
       this.createNet(files[0])
+      this.label = files[0].name
     },
     createNet (file) {
       var reader = new FileReader()
@@ -58,34 +61,33 @@ export default {
             listOfNets.push(newNet)
           }
         }
-        this.$store.commit('addTodo', listOfNets)
+        console.log(listOfNets)
+        const name = 'listOfNets'
+        this.$store.commit('setList', {name, list: listOfNets})
       }
       reader.readAsText(file)
-    },
-    ...mapMutations([
-      'increment'
-    ])
+    }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-h1, h2 {
-  font-weight: normal;
-}
+<style lang="scss">
+  .uploader {
+    width: 100%;
+    border-radius: .25rem;
+    padding: .5rem 1rem;
+    border: 2px dashed #007bff;
+    color: #007bff;
+    cursor: pointer;
+    transition: background-color .1s linear;
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+    &:hover {
+      background-color: rgba(#007bff, .15);
+      color: #0056b3;
+    }
 
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #35495E;
-}
+    &__input {
+      display: none;
+    }
+  }
 </style>

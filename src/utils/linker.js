@@ -1,8 +1,6 @@
-import Matrix from '@/utils/MatrixR'
-
-export default function (state, k) {
-  let defaultMatrix = Matrix(state)
-  // defaultMatrix = [[0, 1, 0, 0, 2, 3, 0, 0],
+export default function (matrixR, listOfNets, k) {
+  // let matrixR = Matrix(state)
+  // matrixR = [[0, 1, 0, 0, 2, 3, 0, 0],
   //   [1, 0, 1, 0, 0, 1, 0, 0],
   //   [0, 1, 0, 2, 0, 0, 1, 0],
   //   [0, 0, 2, 0, 0, 0, 3, 1],
@@ -12,10 +10,10 @@ export default function (state, k) {
   //   [0, 0, 0, 1, 0, 1, 2, 0]]
   let miserables = {nodes: [], links: []} // Инициализация колекции
   let listOfElements = [] // Виды элементов
-  for (let e in state.listOfNets) {
-    for (let eName in state.listOfNets[e].elements) {
-      if (!listOfElements.includes(state.listOfNets[e].elements[eName].elementName)) {
-        listOfElements.push(state.listOfNets[e].elements[eName].elementName)
+  for (let e in listOfNets) {
+    for (let eName in listOfNets[e].elements) {
+      if (!listOfElements.includes(listOfNets[e].elements[eName].elementName)) {
+        listOfElements.push(listOfNets[e].elements[eName].elementName)
       }
     }
   }
@@ -24,7 +22,7 @@ export default function (state, k) {
   // listOfElements = [1, 2, 3, 4, 5, 6, 7, 8]
 
   let localRank = []
-  for (let net of defaultMatrix) {
+  for (let net of matrixR) {
     let n = 0
     let m = 0
     for (let el of net) {
@@ -37,7 +35,7 @@ export default function (state, k) {
 
   let s = 0
   console.log(localRank)
-  for (let i = 1; i < defaultMatrix.length; i++) {
+  for (let i = 1; i < matrixR.length; i++) {
     if (i === 1) {
       let minRank = minRankF(localRank)
       // console.log(minRank)
@@ -45,9 +43,9 @@ export default function (state, k) {
       miserables.nodes.push({id: listOfElements[xG[0]], group: 1})
     }
     s++
-    for (let j = i; j < s * k && j < defaultMatrix.length; j++) {
+    for (let j = i; j < s * k && j < matrixR.length; j++) {
       let currentX = xG[i - 1]
-      xG.push(getNextX(defaultMatrix[currentX], localRank[currentX], xG))
+      xG.push(getNextX(matrixR[currentX], localRank[currentX], xG))
       // console.log(i)
       // console.log(xG)
       miserables.nodes.push({id: listOfElements[xG[i]], group: s})
@@ -56,18 +54,18 @@ export default function (state, k) {
     }
   }
 
-  // for (let i = 1; i < defaultMatrix.length; i++) {
+  // for (let i = 1; i < matrixR.length; i++) {
   //   console.log(k)
   //   s++
   //   let minRank = minRankOF(localRank, xG)
   //   xG.push(localRank.indexOf(minRank))
   //   miserables.nodes.push({id: listOfElements[xG[i-1]], group: s})
-  //   for (let j = i; j < s * k && j < defaultMatrix.length; j++) {
+  //   for (let j = i; j < s * k && j < matrixR.length; j++) {
   //     console.log('Как?')
   //     let currentX = xG[i - 1]
   //     // console.log(i)
   //     // console.log(xG)
-  //     xG.push(getNextX(defaultMatrix[currentX], localRank[currentX], xG))
+  //     xG.push(getNextX(matrixR[currentX], localRank[currentX], xG))
   //     miserables.nodes.push({id: listOfElements[xG[i]], group: s})
   //     i++
   //   }
@@ -75,8 +73,8 @@ export default function (state, k) {
 
   for (let i in listOfElements) {
     for (let j = i; j < listOfElements.length; j++) {
-      if (defaultMatrix[i][j] !== 0) {
-        miserables.links.push({source: listOfElements[i], target: listOfElements[j], value: defaultMatrix[i][j]})
+      if (matrixR[i][j] !== 0) {
+        miserables.links.push({source: listOfElements[i], target: listOfElements[j], value: matrixR[i][j]})
       }
     }
   }

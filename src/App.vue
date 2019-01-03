@@ -1,51 +1,66 @@
 <template>
   <div id="app">
-    <header class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand">Мой компоновщик на Vue.js</a>
-        <div class="navbar-collapse collapse show">
-          <div class="mr-auto"></div>
-          <uploader >
-          </uploader>
-        </div>
+    <div class="aside" width="360px" style="background-color: rgb(238, 241, 246)">
+      <ul class="nav flex-column nav-pills">
+        <li class="nav-item">
+          <router-link active-class="active" class="nav-link" :to="{name: 'CAD'}">Граф элементных комплексов</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link active-class="active" class="nav-link" :to="{name: 'Linker'}">Граф результата компоновки</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link active-class="active" class="nav-link" :to="{name: 'matrixR'}">Матрица R</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link active-class="active" class="nav-link" :to="{name: 'matrixQ'}">Матрица Q</router-link>
+        </li>
+      </ul>
+      <uploader style="margin-top: 16px;"/>
+      <div style="margin-top: 8px;" class="form-group" v-if="$route.name === 'Linker'">
+        <label for="count">Элементов на плате</label>
+        <input v-model="boardCount" class="form-control" type="number" name="count" id="count" min="2">
       </div>
-    </header>
-    <div>
-      <b-nav tabs style="margin-top: 2rem;">
-        <div class="container">
-          <b-nav-item to="/" exact>Граф элементных комплексов</b-nav-item>
-          <b-nav-item to="/Linker">Граф результата компоновки</b-nav-item>
-          <b-nav-item to="/MatrixR">Матрица R</b-nav-item>
-          <b-nav-item to="/MatrixQ">Матрица Q</b-nav-item>
-        </div>
-      </b-nav>
+      <boxes style="flex-grow: 1;"/>
     </div>
-    <main class="container-fluid">
+    <div class="main-container">
       <router-view></router-view>
-    </main>
-    <div style="height: 60px;"></div>
-    <footer class="bg-dark footer">
-      <div class="container">
-        <span class="text-muted">Заболотский А.В.</span>
-      </div>
-    </footer>    
+    </div>
   </div>
 </template>
 
 <script>
-import Uploader from '@/components/uploader'
+import Uploader from '@/components/Uploader'
+import Boxes from '@/components/Boxes'
 
 export default {
   name: 'app',
   components: {
-    Uploader
+    Uploader,
+    Boxes
+  },
+  computed: {
+    title () {
+      return this.$route.name
+    },
+    colorScheme () {
+      return this.$store.state.colorScheme
+    },
+    boardCount: {
+      get () {
+        return this.$store.state.boardCount
+      },
+      set (value) {
+        this.$store.commit('setProp', {name: 'boardCount', value})
+      }
+    }
   }
 }
 </script>
 
 <style>
-body {
+html, body {
   margin: 0;
+  height: 100%;
 }
 
 #app {
@@ -53,37 +68,47 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  height: 100%;
 }
 
-main {
-  text-align: center;
-  margin-top: 40px;
-}
-
-header {
-  margin: 0;
-  height: 56px;
-  padding: 0 16px 0 24px;
-  background-color: #35495E;
-  color: #ffffff;
-}
-footer {
-  position: fixed;
+.aside {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
   bottom: 0;
-  width: 100%;
-  height: 60px;
-  line-height: 60px;
-  background-color: #f5f5f5;
+  left: 0;
+  width: 320px;
+  background-color: rgb(238, 241, 246);
+  padding: 16px 8px;
 }
-
-header span {
-  display: block;
-  position: relative;
-  font-size: 20px;
-  line-height: 1;
-  letter-spacing: .02em;
-  font-weight: 400;
-  box-sizing: border-box;
-  padding-top: 16px;
+.body-container {
+  min-height: 100%;
+}
+.main-container {
+  overflow: auto;
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 320px;
+  right: 0px;
+}
+.title {
+  font-size: 24px;
+  line-height: 24px;
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  left: 320px;
+  border-bottom-right-radius: 6px;
+  color: white;
+  padding: 8px;
+  background: #2c3e50;
+}
+.table {
+  margin-bottom: 0;
+}
+.nav {
+  flex-shrink: 0;
 }
 </style>

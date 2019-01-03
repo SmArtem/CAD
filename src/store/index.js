@@ -1,30 +1,27 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import { state, mutations } from './mutations'
+
+import linker from '@/utils/linker'
+import matrixR from '@/utils/matrixR'
+import matrixQ from '@/utils/matrixQ'
+import mack from '@/utils/mack'
+
+import {scaleOrdinal, schemeCategory10} from 'd3'
 
 Vue.use(Vuex)
 
-// export default new Vuex.Store({
-//   state: {
-//     count: 0
-//   },
-//   mutations: {
-//     increment (state) {
-//       state.count++
-//     }
-//   }
-// })
-
 export default new Vuex.Store({
   state: {
-    listOfNets: []
+    listOfNets: [],
+    boardCount: 4,
+    colorScheme: scaleOrdinal(schemeCategory10)
   },
   mutations: {
-    addTodo (state, newElements) {
-      state.listOfNets = newElements
+    setList (state, {name, list}) {
+      state[name] = list || []
     },
-    increment (state) {
-      state.listOfNets.push({name: 'dsdsads'})
+    setProp (state, {name, value}) {
+      state[name] = value
     }
   },
   getters: {
@@ -39,15 +36,14 @@ export default new Vuex.Store({
       }
       return listOfElements.sort()
     },
-    getListOfChainName: state => {
-      let listOfElements = []
-      for (let e in state.listOfNets) {
-        listOfElements.push(state.listOfNets[e].name)
-      }
-      return listOfElements
+    getListOfChainName: state => state.listOfNets.map(el => el.name),
+    matrixR: state => matrixR(state),
+    matrixQ: state => matrixQ(state),
+    linker (state, getters) {
+      return state.boardCount > 1 ? linker(getters.matrixR, state.listOfNets, state.boardCount) : {links: [], nodes: []}
     },
-    getMatrixR: (state, getters) => {
-
+    mack (state, getters) {
+      return state.boardCount > 1 ? mack(getters.matrixQ, state.listOfNets) : {links: [], nodes: []}
     }
   }
 })
